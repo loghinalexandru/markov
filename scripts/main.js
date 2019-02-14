@@ -1,4 +1,4 @@
-let model =  new Markov(2);
+let model =  new Markov(1 , ".");
 
 function addNewsTitles(domains){
 	fetch("https://newsapi.org/v2/everything?pageSize=100&domains=" + domains + "&apiKey=37a072c5b2a94bbdac965b2f49a19ce8")
@@ -7,7 +7,7 @@ function addNewsTitles(domains){
 	})
 	.then(data => {
 		for(let i = 0; i < data.articles.length; ++i){
-			model.addToDictionary(data.articles[i].content);
+			model.addToDictionary(data.articles[i].title);
 		}
 	});
 
@@ -19,12 +19,16 @@ window.onload = () =>{
 	addNewsTitles("nytimes.com");
 	addNewsTitles("edition.cnn.com");
 	addNewsTitles("foxnews.com");
-	setInterval(insertGeneratedText , 10000);
+	addNewsTitles("abcnews.go.com");
+	addNewsTitles("aljazeera.com");
+	addNewsTitles("ansa.it");
+	addNewsTitles("arstechnica.com");
+	setInterval(insertGeneratedText , 5000);
 }
 
 function insertGeneratedText(){
 	let elem = document.getElementsByTagName("body")[0];
-	elem.innerHTML = model.generateText(1000);
+	elem.innerHTML += "<p>" + model.getText(10) + "</p>";
 }
 
 

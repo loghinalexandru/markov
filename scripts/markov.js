@@ -2,19 +2,12 @@ class Markov{
 	constructor(order = 1 , terminator = "_$_"){
 		this.order = order;
 		this.entryWords = [];
-		this.endWords = {};
 		this.dictionary = {};
 		this.terminator = terminator;
 	}
 
 	parsePhrase(phrase){
-		let listOfWords = phrase.split(/([\W])/);
-		for(let i = 0; i < listOfWords.length; ++i){
-			if(listOfWords[i] === " " || listOfWords[i] === ""){
-				listOfWords.splice(i , 1);
-				--i;
-			}
-		}
+		let listOfWords = phrase.split(" ");
 		// Insert terminator for end of phrase
 		listOfWords.push(this.terminator);
 		return listOfWords;
@@ -61,39 +54,32 @@ class Markov{
 		list.splice(0 , 1);
 	}
 	// TODO : Rewrite code cleaner in generateText()
-	// TODO : Solve cycles in text generation
-	generateText(length){
-		if(length < this.order)
-			throw "Length too small for order " + this.order;
+	// Add a gamma factor for how random the next word should be
+	generateText(){
 		let currentWordSequence = randomItem(this.entryWords);
 		let constructedText = currentWordSequence;
 		let nextWord = "";
 		let key = "";
 		currentWordSequence = currentWordSequence.split(" ");
-		for(let i = length - this.order; i >= 0; --i){
+		while(nextWord !== this.terminator){
 			key = currentWordSequence.join(" ");
-			let wordTransition = maxFromDictionary(this.dictionary[key]);
-			if(this.dictionary[key][wordTransition] === this.dictionary[minFromDictionary(this.dictionary[key])]) {
-				nextWord = randomItem(Object.keys(this.dictionary[key]));
-			}
-			else{
-				nextWord = wordTransition; 
-			}
-			if(nextWord !== this.terminator){
-				if(nextWord.length  > 1)
-					constructedText = constructedText + " " + nextWord;
-				else
-					constructedText = constructedText + nextWord;
-				this.cycleWordSequence(currentWordSequence , nextWord);
-			}
-			else{
-				break;
-			}
+			nextWord = randomItem(Object.keys(this.dictionary[key]));
+			constructedText = constructedText + " " + nextWord;
+			this.cycleWordSequence(currentWordSequence , nextWord);
 		}
 		return constructedText;
 	}
-}
 
+	getText(minLenght = 1){
+		let output = "";
+		while(minLenght > 0){
+			let phrase = this.generateText();
+			output += phrase;
+			minLenght -= phrase.split(" ").length;
+		}
+		return output;
+	}
+}
 
 function randomItem(list){
 	return list[Math.floor(Math.random() * list.length)];
