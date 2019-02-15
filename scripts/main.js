@@ -1,4 +1,4 @@
-let model =  new Markov(1 , ".");
+let model =  new Markov(3 , ".");
 
 function addNewsTitles(domains){
 	fetch("https://newsapi.org/v2/everything?pageSize=100&domains=" + domains + "&apiKey=37a072c5b2a94bbdac965b2f49a19ce8")

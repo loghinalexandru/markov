@@ -13,12 +13,7 @@ class Markov{
 		return listOfWords;
 	}
 
-	setDictionary(listOfText){
-		for(let i = 0; i < listOfText.length; ++i){
-			parsePhrase(listOfText[i]);
-		}
-	}
-
+	// TODO: Kat'z BackOff 
 	addToDictionary(string){
 		let words = this.parsePhrase(string);
 		let currentWordSequence= "";
@@ -33,16 +28,17 @@ class Markov{
 			throw "Too small phrase for order " + this.order;
 			return;
 		}
+		// Creating entry for every gram up to n-gram where n is the markov order
 		for(let i = this.order; i < words.length; ++i){
-			key = currentWordSequence.join(" ");
-
-			if(!(key in this.dictionary))
-				this.dictionary[key] = {};
-			if(words[i] in this.dictionary[key])
-				this.dictionary[key][words[i]] += 1;
-			else
-				this.dictionary[key][words[i]] = 1;
-
+			for(let j = 0; j < this.order; ++j){
+				key = currentWordSequence.slice(j).join(" ");
+				if(!(key in this.dictionary))
+					this.dictionary[key] = {};
+				if(words[i] in this.dictionary[key])
+					this.dictionary[key][words[i]] += 1;
+				else
+					this.dictionary[key][words[i]] = 1;
+			}
 			// Move entry one word further
 			this.cycleWordSequence(currentWordSequence , words[i]);
 
@@ -55,17 +51,24 @@ class Markov{
 	}
 	// TODO : Rewrite code cleaner in generateText()
 	// Add a gamma factor for how random the next word should be
+	// Adding Kat'z BackOff to generator
 	generateText(){
 		let currentWordSequence = randomItem(this.entryWords);
 		let constructedText = currentWordSequence;
 		let nextWord = "";
-		let key = "";
+		let key = currentWordSequence;
 		currentWordSequence = currentWordSequence.split(" ");
 		while(nextWord !== this.terminator){
+			// BackOff strategy
+			let diff = Object.keys(this.dictionary[key]).length - this.order;
+			if(diff < 0 && currentWordSequence.length - 1 > 1){
+				currentWordSequence = currentWordSequence.slice(Math.abs(diff));
+			}
+			//Construct n+1 gram if good-turing estimation is found
 			key = currentWordSequence.join(" ");
 			nextWord = randomItem(Object.keys(this.dictionary[key]));
+			currentWordSequence.push(nextWord);
 			constructedText = constructedText + " " + nextWord;
-			this.cycleWordSequence(currentWordSequence , nextWord);
 		}
 		return constructedText;
 	}
