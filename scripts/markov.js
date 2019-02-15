@@ -60,14 +60,22 @@ class Markov{
 		currentWordSequence = currentWordSequence.split(" ");
 		while(nextWord !== this.terminator){
 			// BackOff strategy
-			let diff = Object.keys(this.dictionary[key]).length - this.order;
-			if(diff < 0 && currentWordSequence.length - 1 > 1){
-				currentWordSequence = currentWordSequence.slice(Math.abs(diff));
+			key = currentWordSequence.join(" "); 
+			for(let i = 1; i < this.order; ++i){
+				if(Object.keys(this.dictionary[key]).length < this.order && currentWordSequence.length > 1){
+					currentWordSequence.splice(0 , 1);
+					key = currentWordSequence.join(" ");
+				}
+				else{
+					break;
+				}
 			}
 			//Construct n+1 gram if good-turing estimation is found
-			key = currentWordSequence.join(" ");
 			nextWord = randomItem(Object.keys(this.dictionary[key]));
-			currentWordSequence.push(nextWord);
+			if(Object.keys(this.dictionary[key]).length >= this.order && currentWordSequence.length < this.order)
+				currentWordSequence.push(nextWord);
+			else
+				this.cycleWordSequence(currentWordSequence , nextWord);
 			constructedText = constructedText + " " + nextWord;
 		}
 		return constructedText;
