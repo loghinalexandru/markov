@@ -13,6 +13,7 @@ function addNewsTitles(domains){
 
 }
 
+/*
 window.onload = () =>{
 	addNewsTitles("bbc.co.uk");
 	addNewsTitles("wsj.com");
@@ -24,10 +25,24 @@ window.onload = () =>{
 	addNewsTitles("arstechnica.com");
 	setInterval(insertGeneratedText , 5000);
 }
+*/
+function readFromFile(){
+	var file = document.getElementById("input").files[0];
+	var reader = new FileReader();
+	reader.readAsText(file);
+	reader.onload = (e) =>{
+		let text = e.target.result;
+		text = text.split("\n");
+		for(let i = 0; i < text.length - 1; ++i){
+			model.addToDictionary(text[i]);
+		}
+		setInterval(insertGeneratedText , 3000);
+	} 
+}
 
 function insertGeneratedText(){
 	let elem = document.getElementsByTagName("body")[0];
-	elem.innerHTML += "<p>" + model.getText(10) + "</p>";
+	elem.innerHTML += "<p>" + model.getText(1) + "</p>";
 }
 
 

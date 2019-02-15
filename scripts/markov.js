@@ -15,6 +15,7 @@ class Markov{
 	}
 
 	// TODO: Kat'z BackOff 
+	// TODO: Change entry words to start from 1-gram always or random choice from dictionary
 	addToDictionary(string){
 		let words = this.parsePhrase(string);
 		let currentWordSequence= "";
