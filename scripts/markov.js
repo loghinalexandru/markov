@@ -1,9 +1,10 @@
 class Markov{
-	constructor(order = 1 , terminator = "_$_"){
+	constructor(order = 1 , terminator = "_$_" , gamma = 0.5){
 		this.order = order;
 		this.entryWords = [];
 		this.dictionary = {};
 		this.terminator = terminator;
+		this.gamma = gamma;
 	}
 
 	parsePhrase(phrase){
@@ -50,8 +51,16 @@ class Markov{
 		list.splice(0 , 1);
 	}
 	// TODO : Rewrite code cleaner in generateText()
-	// Add a gamma factor for how random the next word should be
-	// Adding Kat'z BackOff to generator
+	pickNextWord(key){
+		let randomFactor = Math.random();
+		if(randomFactor <= this.gamma){
+			return randomItem(Object.keys(this.dictionary[key]));
+		}
+		else{
+			return maxFromDictionary(this.dictionary[key]);
+		}
+	}
+
 	generateText(){
 		let currentWordSequence = randomItem(this.entryWords);
 		let constructedText = currentWordSequence;
@@ -71,7 +80,7 @@ class Markov{
 				}
 			}
 			//Construct n+1 gram if good-turing estimation is found
-			nextWord = randomItem(Object.keys(this.dictionary[key]));
+			nextWord = this.pickNextWord(key);
 			if(Object.keys(this.dictionary[key]).length >= this.order && currentWordSequence.length < this.order)
 				currentWordSequence.push(nextWord);
 			else

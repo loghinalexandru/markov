@@ -1,7 +1,7 @@
-let model =  new Markov(3 , ".");
+let model =  new Markov(3, "." , 0.3);
 
 function addNewsTitles(domains){
-	fetch("https://newsapi.org/v2/everything?pageSize=100&domains=" + domains + "&apiKey=37a072c5b2a94bbdac965b2f49a19ce8")
+	fetch("https://newsapi.org/v2/everything?q=apple&domains=" + domains + "&pageSize=100&apiKey=37a072c5b2a94bbdac965b2f49a19ce8")
 	.then(response => {
 		return response.json()
 	})
@@ -21,7 +21,6 @@ window.onload = () =>{
 	addNewsTitles("foxnews.com");
 	addNewsTitles("abcnews.go.com");
 	addNewsTitles("aljazeera.com");
-	addNewsTitles("ansa.it");
 	addNewsTitles("arstechnica.com");
 	setInterval(insertGeneratedText , 5000);
 }
