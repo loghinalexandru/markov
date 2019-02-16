@@ -13,26 +13,24 @@ class Markov{
 		listOfWords.push(this.terminator);
 		return listOfWords;
 	}
-
-	// TODO: Kat'z BackOff 
-	// TODO: Change entry words to start from 1-gram always or random choice from dictionary
+	// Always start from 1-gram
 	addToDictionary(string){
 		let words = this.parsePhrase(string);
 		let currentWordSequence= "";
 		let key = "";
-		if(words.length > this.order){
-			currentWordSequence = words.slice(0,this.order);
+		if(words.length > 1){
+			currentWordSequence = words.slice(0 , 1);
 			key = currentWordSequence.join(" ");
 			if(!this.entryWords.includes(key))
 				this.entryWords.push(key);
 		}
 		else{
-			throw "Too small phrase for order " + this.order;
+			throw "Empty phrase!";
 			return;
 		}
 		// Creating entry for every gram up to n-gram where n is the markov order
-		for(let i = this.order; i < words.length; ++i){
-			for(let j = 0; j < this.order; ++j){
+		for(let i = 1; i < words.length; ++i){
+			for(let j = 0; j < this.order && j < currentWordSequence.length; ++j){
 				key = currentWordSequence.slice(j).join(" ");
 				if(!(key in this.dictionary))
 					this.dictionary[key] = {};
@@ -41,9 +39,13 @@ class Markov{
 				else
 					this.dictionary[key][words[i]] = 1;
 			}
-			// Move entry one word further
-			this.cycleWordSequence(currentWordSequence , words[i]);
-
+			// Move entry one word further if requirement is meet or add up to n-gram
+			if(currentWordSequence.length < this.order){
+				currentWordSequence.push(words[i]);
+			}
+			else{
+				this.cycleWordSequence(currentWordSequence , words[i]);
+			}
 		}
 	}
 
@@ -51,7 +53,7 @@ class Markov{
 		list.push(word);
 		list.splice(0 , 1);
 	}
-	// TODO : Rewrite code cleaner in generateText()
+
 	pickNextWord(key){
 		let randomFactor = Math.random();
 		if(randomFactor <= this.gamma){

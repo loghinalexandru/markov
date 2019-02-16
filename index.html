@@ -4,8 +4,12 @@
 </head>
 
 <body>
-	<input type="file" id="input" name="file">
-	<button onclick="readFromFile()">GENERATE</button>
+	<div class="showContent" style="display: grid;grid-template-rows: 1fr 1fr;grid-template-columns:1fr 1fr;text-align:center;">
+	</div>
+	<div class="input" style="display:flex;justify-content:center">
+		<input type="file" id="input" name="file">
+		<button onclick="readFromFile()">GENERATE</button>
+	</div>
 	<script src="./scripts/markov.js"></script>
 	<script src="./scripts/main.js"></script>
 </body>
